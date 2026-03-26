@@ -1,14 +1,17 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using U2P3_PetsAPI.Models.DTO;
 using U2P3_PetsAPI.Models.Pets;
+
 
 namespace U2P3_PetsAPI.Controllers
 {
+    
     public class AppointmentsController : Controller
     {
         private readonly PetsContext _context;
@@ -165,5 +168,35 @@ namespace U2P3_PetsAPI.Controllers
         {
             return _context.Appointments.Any(e => e.AppointmentId == id);
         }
+
+        [HttpGet("GetAppointments")]
+        public async Task<ActionResult<IEnumerable<AppointmentDTO>>> GetAppointments()
+        {
+            var appointments = await _context.Appointments
+                .Select(a => new AppointmentDTO
+                {
+                    AppointmentId = a.AppointmentId,
+                    AppointmentDate = (DateTime)a.AppointmentDate,
+                    Reason = a.Reason,
+
+                    // Pet
+                    PetId = a.Pet.PetId,
+                    PetName = a.Pet.Name,
+                    Species = a.Pet.Species,
+
+                    // Owner (a través de Pet)
+                    OwnerId = a.Pet.Owner.OwnerId,
+                    OwnerName = a.Pet.Owner.Name,
+
+                    // Vet
+                    VetId = a.Vet.VetId,
+                    VetName = a.Vet.Name,
+                    Specialty = a.Vet.Specialty
+                })
+                .ToListAsync();
+
+            return Ok(appointments);
+        }
+
     }
 }
