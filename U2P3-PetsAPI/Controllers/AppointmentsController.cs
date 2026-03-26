@@ -59,7 +59,8 @@ namespace U2P3_PetsAPI.Controllers
         // POST: Appointments/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+
+        [HttpPost("CreateAppointments")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AppointmentId,PetId,VetId,AppointmentDate,Reason")] Appointment appointment)
         {
@@ -72,6 +73,20 @@ namespace U2P3_PetsAPI.Controllers
             ViewData["PetId"] = new SelectList(_context.Pets, "PetId", "PetId", appointment.PetId);
             ViewData["VetId"] = new SelectList(_context.Veterinarians, "VetId", "VetId", appointment.VetId);
             return View(appointment);
+        }
+        [HttpPost("PostAppointment")]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> PostAppointment(int petId, int vetId, string appointment, string reason)
+        {
+            //if (ModelState.IsValid)
+            //{
+                _context.Add(appointment);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            //}
+
+            return Ok();
+         
         }
 
         // GET: Appointments/Edit/5
@@ -178,6 +193,7 @@ namespace U2P3_PetsAPI.Controllers
                     AppointmentId = a.AppointmentId,
                     AppointmentDate = (DateTime)a.AppointmentDate,
                     Reason = a.Reason,
+                    
 
                     // Pet
                     PetId = a.Pet.PetId,
@@ -197,6 +213,7 @@ namespace U2P3_PetsAPI.Controllers
 
             return Ok(appointments);
         }
+
 
     }
 }
