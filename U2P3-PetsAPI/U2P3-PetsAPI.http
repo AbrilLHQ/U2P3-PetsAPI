@@ -1,0 +1,6 @@
+@U2P3_PetsAPI_HostAddress = http://localhost:5213
+
+GET {{U2P3_PetsAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
