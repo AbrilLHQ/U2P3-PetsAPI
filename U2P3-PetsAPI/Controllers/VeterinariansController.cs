@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using U2P3_PetsAPI.Models.DTO;
 using U2P3_PetsAPI.Models.Pets;
 
 namespace U2P3_PetsAPI.Controllers
@@ -152,5 +153,30 @@ namespace U2P3_PetsAPI.Controllers
         {
             return _context.Veterinarians.Any(e => e.VetId == id);
         }
+
+        [HttpPut("UpdateVeterinarian/{vetId}")]
+        public async Task<ActionResult<VeterinariansDTO>> UpdateVeterinarian(int vetId, [FromBody] VeterinariansDTO veterinarianDTO)
+        {
+            if (vetId != veterinarianDTO.VetId)
+            {
+                return BadRequest("ID mismatch");
+            }
+
+            var veterinarian = await _context.Veterinarians
+                .FirstOrDefaultAsync(v => v.VetId == vetId);
+
+            if (veterinarian == null)
+            {
+                return NotFound($"Veterinarian with ID {vetId} not found");
+            }
+
+            //Actualizar
+            veterinarian.Name = veterinarianDTO.VetName;
+            veterinarian.Specialty = veterinarianDTO.Specialty;
+            await _context.SaveChangesAsync();
+
+            return Ok(veterinarianDTO);
+        }
+
     }
 }
