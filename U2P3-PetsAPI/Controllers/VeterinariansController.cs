@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using U2P3_PetsAPI.Models.DTO;
 using U2P3_PetsAPI.Models.Pets;
 
 namespace U2P3_PetsAPI.Controllers
@@ -151,6 +152,21 @@ namespace U2P3_PetsAPI.Controllers
         private bool VeterinarianExists(int id)
         {
             return _context.Veterinarians.Any(e => e.VetId == id);
+        }
+        [HttpGet("GetVeterinarians")]
+        public async Task<ActionResult<IEnumerable<VeterinariansDTO>>> GetAppointments()
+        {
+            var veterinarians = await _context.Appointments
+                .Select(vet => new VeterinariansDTO
+                {
+                    // Vet
+                    VetId = vet.Vet.VetId,
+                    VetName = vet.Vet.Name,
+                    Specialty = vet.Vet.Specialty
+                })
+                .ToListAsync();
+
+            return Ok(veterinarians);
         }
     }
 }
