@@ -156,13 +156,13 @@ namespace U2P3_PetsAPI.Controllers
         [HttpGet("GetVeterinarians")]
         public async Task<ActionResult<IEnumerable<VeterinariansDTO>>> GetAppointments()
         {
-            var veterinarians = await _context.Appointments
+            var veterinarians = await _context.Veterinarians
                 .Select(vet => new VeterinariansDTO
                 {
                     // Vet
-                    VetId = vet.Vet.VetId,
-                    VetName = vet.Vet.Name,
-                    Specialty = vet.Vet.Specialty
+                    VetId = vet.VetId,
+                    VetName = vet.Name,
+                    Specialty = vet.Specialty
                 })
                 .ToListAsync();
 
