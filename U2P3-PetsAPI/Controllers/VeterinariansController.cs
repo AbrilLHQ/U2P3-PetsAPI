@@ -154,7 +154,7 @@ namespace U2P3_PetsAPI.Controllers
             return _context.Veterinarians.Any(e => e.VetId == id);
         }
         [HttpGet("GetVeterinarians")]
-        public async Task<ActionResult<IEnumerable<VeterinariansDTO>>> GetAppointments()
+        public async Task<ActionResult<IEnumerable<VeterinariansDTO>>> GetVeterinarians()
         {
             var veterinarians = await _context.Veterinarians
                 .Select(vet => new VeterinariansDTO
