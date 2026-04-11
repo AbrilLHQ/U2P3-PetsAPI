@@ -78,6 +78,9 @@ namespace U2P3_PetsAPI.Controllers
         //[ValidateAntiForgeryToken]
         public async Task<IActionResult> PostAppointment([FromBody] AppointmentDTO appointment)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var newAppointment = new Appointment
@@ -98,7 +101,6 @@ namespace U2P3_PetsAPI.Controllers
                 return StatusCode(500, new { message = "Error interno", error = ex.Message });
             }
             
-
         }
 
         // GET: Appointments/Edit/5
