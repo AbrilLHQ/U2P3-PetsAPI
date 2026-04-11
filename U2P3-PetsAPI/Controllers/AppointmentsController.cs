@@ -76,17 +76,29 @@ namespace U2P3_PetsAPI.Controllers
         }
         [HttpPost("PostAppointment")]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> PostAppointment(int petId, int vetId, string appointment, string reason)
+        public async Task<IActionResult> PostAppointment([FromBody] AppointmentDTO appointment)
         {
-            //if (ModelState.IsValid)
-            //{
-                _context.Add(appointment);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            //}
+            try
+            {
+                var newAppointment = new Appointment
+                {
+                    PetId = appointment.PetId,
+                    VetId = appointment.VetId,
+                    AppointmentDate = appointment.AppointmentDate,
+                    Reason = appointment.Reason
+                };
 
-            return Ok();
-         
+                _context.Appointments.Add(newAppointment);
+                await _context.SaveChangesAsync();
+
+                return Ok(newAppointment);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error interno", error = ex.Message });
+            }
+            
+
         }
 
         // GET: Appointments/Edit/5
