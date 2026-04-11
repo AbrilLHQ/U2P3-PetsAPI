@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using U2P3_PetsAPI.Models.DTO;
 using U2P3_PetsAPI.Models.Pets;
 
 namespace U2P3_PetsAPI.Controllers
@@ -151,6 +152,30 @@ namespace U2P3_PetsAPI.Controllers
         private bool OwnerExists(int id)
         {
             return _context.Owners.Any(e => e.OwnerId == id);
+        }
+
+        // PUT: Owners/PutOwner
+        [HttpPut("PutOwner/{id}")]
+        public async Task<IActionResult> PutOwner(int id, OwnerDTO ownerDto)
+        {
+            var owner = await _context.Owners.FindAsync(id);
+            if (owner == null)
+                return NotFound($"No se encontró el Owner con ID {id}");
+
+            owner.Name = ownerDto.Name;
+            owner.Phone = ownerDto.Phone;
+            owner.Email = ownerDto.Email;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500, "Error al actualizar");
+            }
+
+            return Ok(owner);
         }
     }
 }
