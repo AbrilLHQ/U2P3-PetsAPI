@@ -11,7 +11,7 @@ using U2P3_PetsAPI.Models.Pets;
 
 namespace U2P3_PetsAPI.Controllers
 {
-    
+
     public class AppointmentsController : Controller
     {
         private readonly PetsContext _context;
@@ -80,13 +80,13 @@ namespace U2P3_PetsAPI.Controllers
         {
             //if (ModelState.IsValid)
             //{
-                _context.Add(appointment);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+            _context.Add(appointment);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
             //}
 
             return Ok();
-         
+
         }
 
         // GET: Appointments/Edit/5
@@ -188,19 +188,21 @@ namespace U2P3_PetsAPI.Controllers
         public async Task<ActionResult<IEnumerable<AppointmentDTO>>> GetAppointments()
         {
             var appointments = await _context.Appointments
+                .Include(a => a.Pet)
+                    .ThenInclude(p => p.Owner)   
+                .Include(a => a.Vet)
                 .Select(a => new AppointmentDTO
                 {
                     AppointmentId = a.AppointmentId,
                     AppointmentDate = (DateTime)a.AppointmentDate,
                     Reason = a.Reason,
-                    
 
                     // Pet
                     PetId = a.Pet.PetId,
                     PetName = a.Pet.Name,
                     Species = a.Pet.Species,
 
-                    // Owner (a través de Pet)
+                    // Owner
                     OwnerId = a.Pet.Owner.OwnerId,
                     OwnerName = a.Pet.Owner.Name,
 
