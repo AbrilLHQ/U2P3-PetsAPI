@@ -169,14 +169,36 @@ namespace U2P3_PetsAPI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var appointment = await _context.Appointments.FindAsync(id);
-            if (appointment != null)
+            try
             {
-                _context.Appointments.Remove(appointment);
-            }
+                var appointment = await _context.Appointments.FindAsync(id);
+                if (appointment == null)
+                {
+                    return NotFound();
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                _context.Appointments.Remove(appointment);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError("", "Unable to delete appointment");
+                var appointment = await _context.Appointments
+                    .Include(a => a.Pet)
+                    .Include(a => a.Vet)
+                    .FirstOrDefaultAsync(m => m.AppointmentId == id);
+                return View(appointment);
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "An unexpected error occurred while deleting the appointment.");
+                var appointment = await _context.Appointments
+                    .Include(a => a.Pet)
+                    .Include(a => a.Vet)
+                    .FirstOrDefaultAsync(m => m.AppointmentId == id);
+                return View(appointment);
+            }
         }
 
         private bool AppointmentExists(int id)
