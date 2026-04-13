@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using U2P3_PetsAPI.Models.Pets;
+using U2P3_PetsAPI.Models.DTO;
 
 namespace U2P3_PetsAPI.Controllers
 {
@@ -147,7 +148,27 @@ namespace U2P3_PetsAPI.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        [HttpPost("CreateVeterinarian")]
+        public async Task<ActionResult<VeterinariansDTO>> CreateVeterinarian([FromBody] VeterinariansDTO vetDto)
+        {
+            if (vetDto == null)
+            {
+                return BadRequest();
+            }
 
+            var veterinarian = new Veterinarian
+            {
+                Name = vetDto.VetName,
+                Specialty = vetDto.Specialty
+            };
+
+            _context.Veterinarians.Add(veterinarian);
+            await _context.SaveChangesAsync();
+
+            vetDto.VetId = veterinarian.VetId;
+
+            return Ok(vetDto);
+        }
         private bool VeterinarianExists(int id)
         {
             return _context.Veterinarians.Any(e => e.VetId == id);
