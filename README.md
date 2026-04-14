@@ -1,56 +1,38 @@
-# \# U2P3 - Pets API
+## U2P3 - Pets API
 
-# 
+ 
 
-# \## Descripción
+## Descripción
 
-# 
 
 # U2P3 - Pets API es una aplicación desarrollada como práctica para comprender y aplicar conceptos fundamentales de desarrollo backend utilizando HTTP Context y LINQ.
 
-# 
 
 # En este proyecto, se construirá una API que permite gestionar información relacionada con mascotas, incluyendo operaciones básicas como consulta, registro y filtrado de datos.
 
-# 
 
-# ---
+## Objetivos de la práctica
 
-# 
 
-# \## Objetivos de la práctica
+- Comprender el funcionamiento de los contextos HTTP en una API
 
-# 
+- Utilizar LINQ para realizar consultas eficientes sobre colecciones de datos
 
-# \- Comprender el funcionamiento de los contextos HTTP en una API
+- Implementar operaciones CRUD básicas
 
-# \- Utilizar LINQ para realizar consultas eficientes sobre colecciones de datos
+- Aplicar buenas prácticas en el desarrollo de APIs con .NET
 
-# \- Implementar operaciones CRUD básicas
+## Tecnologías utilizadas
 
-# \- Aplicar buenas prácticas en el desarrollo de APIs con .NET
 
-# 
+- C#
 
-# ---
+- .NET (ASP.NET Core Web API)
 
-# 
+- LINQ
 
-# \## Tecnologías utilizadas
+- HTTP Context
 
-# 
+- Entity Framework Core 
 
-# \- C#
-
-# \- .NET (ASP.NET Core Web API)
-
-# \- LINQ
-
-# \- HTTP Context
-
-# \- Entity Framework Core 
-
-# 
-
-# 
 
