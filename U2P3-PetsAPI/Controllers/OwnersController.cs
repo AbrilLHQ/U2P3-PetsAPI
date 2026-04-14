@@ -19,9 +19,11 @@ namespace U2P3_PetsAPI.Controllers
         }
 
         // GET: Owners
-        public async Task<IActionResult> Index()
+        [HttpGet("GetOwners")]
+        public async Task<IActionResult> GetOwners()
         {
-            return View(await _context.Owners.ToListAsync());
+            var owners = await _context.Owners.ToListAsync();
+            return Ok(owners);
         }
 
         // GET: Owners/Details/5
