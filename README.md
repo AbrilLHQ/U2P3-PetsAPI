@@ -5,10 +5,10 @@
 ## Descripción
 
 
-# U2P3 - Pets API es una aplicación desarrollada como práctica para comprender y aplicar conceptos fundamentales de desarrollo backend utilizando HTTP Context y LINQ.
+###U2P3 - Pets API es una aplicación desarrollada como práctica para comprender y aplicar conceptos fundamentales de desarrollo backend utilizando HTTP Context y LINQ.
 
 
-# En este proyecto, se construirá una API que permite gestionar información relacionada con mascotas, incluyendo operaciones básicas como consulta, registro y filtrado de datos.
+En este proyecto, se construirá una API que permite gestionar información relacionada con mascotas, incluyendo operaciones básicas como consulta, registro y filtrado de datos.
 
 
 ## Objetivos de la práctica
