@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using U2P3_PetsAPI.Models.Pets;
 
 namespace U2P3_PetsAPI.Controllers
 {
-    public class PetsController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PetsController : ControllerBase
     {
         private readonly PetsContext _context;
 
@@ -18,141 +15,99 @@ namespace U2P3_PetsAPI.Controllers
             _context = context;
         }
 
-        // GET: Pets
-        public async Task<IActionResult> Index()
+    
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Pet>>> GetPets()
         {
-            var petsContext = _context.Pets.Include(p => p.Owner);
-            return View(await petsContext.ToListAsync());
+            return await _context.Pets
+                .Include(p => p.Owner)
+                .ToListAsync();
         }
 
-        // GET: Pets/Details/5
-        public async Task<IActionResult> Details(int? id)
+       
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Pet>> GetPet(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var pet = await _context.Pets
                 .Include(p => p.Owner)
-                .FirstOrDefaultAsync(m => m.PetId == id);
+                .FirstOrDefaultAsync(p => p.PetId == id);
+
             if (pet == null)
-            {
                 return NotFound();
-            }
 
-            return View(pet);
+            return pet;
         }
 
-        // GET: Pets/Create
-        public IActionResult Create()
+       
+        [HttpGet("species/{species}")]
+        public async Task<ActionResult<IEnumerable<Pet>>> GetBySpecies(string species)
         {
-            ViewData["OwnerId"] = new SelectList(_context.Owners, "OwnerId", "OwnerId");
-            return View();
+            return await _context.Pets
+                .Where(p => p.Species == species)
+                .ToListAsync();
         }
 
-        // POST: Pets/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpGet("owner/{ownerId}")]
+        public async Task<ActionResult<IEnumerable<Pet>>> GetByOwner(int ownerId)
+        {
+            return await _context.Pets
+                .Where(p => p.OwnerId == ownerId)
+                .ToListAsync();
+        }
+
+       
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PetId,Name,Species,Breed,BirthDate,OwnerId")] Pet pet)
+        public async Task<ActionResult<Pet>> PostPet(Pet pet)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(pet);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["OwnerId"] = new SelectList(_context.Owners, "OwnerId", "OwnerId", pet.OwnerId);
-            return View(pet);
+            // Validar que el Owner exista
+            var ownerExists = await _context.Owners.AnyAsync(o => o.OwnerId == pet.OwnerId);
+
+            if (!ownerExists)
+                return BadRequest("El Owner no existe");
+
+            _context.Pets.Add(pet);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPet), new { id = pet.PetId }, pet);
         }
 
-        // GET: Pets/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pet = await _context.Pets.FindAsync(id);
-            if (pet == null)
-            {
-                return NotFound();
-            }
-            ViewData["OwnerId"] = new SelectList(_context.Owners, "OwnerId", "OwnerId", pet.OwnerId);
-            return View(pet);
-        }
-
-        // POST: Pets/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PetId,Name,Species,Breed,BirthDate,OwnerId")] Pet pet)
+        
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutPet(int id, Pet pet)
         {
             if (id != pet.PetId)
+                return BadRequest();
+
+            _context.Entry(pet).State = EntityState.Modified;
+
+            try
             {
-                return NotFound();
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!PetExists(id))
+                    return NotFound();
+                else
+                    throw;
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(pet);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PetExists(pet.PetId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["OwnerId"] = new SelectList(_context.Owners, "OwnerId", "OwnerId", pet.OwnerId);
-            return View(pet);
+            return NoContent();
         }
 
-        // GET: Pets/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pet = await _context.Pets
-                .Include(p => p.Owner)
-                .FirstOrDefaultAsync(m => m.PetId == id);
-            if (pet == null)
-            {
-                return NotFound();
-            }
-
-            return View(pet);
-        }
-
-        // POST: Pets/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+     
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePet(int id)
         {
             var pet = await _context.Pets.FindAsync(id);
-            if (pet != null)
-            {
-                _context.Pets.Remove(pet);
-            }
 
+            if (pet == null)
+                return NotFound();
+
+            _context.Pets.Remove(pet);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NoContent();
         }
 
         private bool PetExists(int id)
